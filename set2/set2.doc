@@ -1,0 +1,44 @@
+- Implement PKCS#7 padding
+- Implement CBC mode
+- An ECB/CBC detection oracle
+- Byte-at-a-time ECB decryption (Simple)
+- ECB cut-and-paste
+- Byte-at-a-time ECB decryption (Harder)
+- PKCS#7 padding validation
+- CBC bitflipping attacks
+
+📌 Understanding AES-CBC Mode (Cipher Block Chaining)
+🔹 What is AES-CBC Mode?
+CBC (Cipher Block Chaining) is a block cipher mode of operation that improves upon the weakness of ECB mode. Instead of encrypting each block independently, CBC chains them together using XOR.
+
+✅ Fixes ECB’s flaw where identical plaintext blocks produce identical ciphertext.
+✅ Uses an Initialization Vector (IV) to randomize the encryption process.
+✅ Each block of plaintext is XOR’d with the previous ciphertext block before encryption.
+
+📌 1️⃣ How AES-CBC Encryption Works
+AES-CBC encrypts plaintext block-by-block, using an IV (Initialization Vector) for the first block.
+
+🔹 Step-by-step encryption process:
+
+1. The plaintext is divided into 16-byte blocks.
+2. First block:
+    - XOR the first plaintext block with the IV.
+    - Encrypt the result using AES-ECB (AES encryption without chaining).
+    - The output becomes Ciphertext Block 1.
+3. For the next blocks:
+    - XOR the next plaintext block with the previous ciphertext block.
+    - Encrypt it using AES-ECB.
+    - The output becomes Ciphertext Block 2.
+4. Repeat until all blocks are encrypted.
+
+Plaintext Block 1  --->  XOR with IV  ---->  Encrypt (AES-ECB)  --->  Ciphertext Block 1
+Plaintext Block 2  --->  XOR with Ciphertext Block 1  ---->  Encrypt (AES-ECB)  --->  Ciphertext Block 2
+Plaintext Block 3  --->  XOR with Ciphertext Block 2  ---->  Encrypt (AES-ECB)  --->  Ciphertext Block 3
+...
+
+📌 5️⃣ How Does the Detection Work?
+We encrypt using either ECB or CBC (randomly chosen).
+ECB mode produces identical blocks for repeated input.
+The detection function (DetectECBMode) scans for duplicate blocks.
+If duplicates exist → It's likely ECB.
+If not → It's CBC.
